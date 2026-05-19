@@ -1,0 +1,44 @@
+name: Dev Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
+      - name: Create build artifact
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='artifacts' \
+            --exclude='db.sqlite3' \
+            -czf artifacts/app-${{ github.sha }}.tar.gz .
+
+      - name: Commit artifact to repository
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add artifacts/
+
+          git commit -m "Add build artifact ${{ github.sha }}" || echo "No changes"
+
+          git push origin dev
+
+      - name: Build Docker image from artifact
+        run: |
+          docker build \
+            --build-arg ARTIFACT_PATH=artifacts/app-${{ github.sha }}.tar.gz \
+            -t book-shop:${{ github.sha }} .

@@ -4,13 +4,16 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    tar \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+ARG ARTIFACT_PATH
+
+COPY ${ARTIFACT_PATH} /tmp/app.tar.gz
+
+RUN tar -xzf /tmp/app.tar.gz -C /app && rm /tmp/app.tar.gz
 
 RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
 
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 
