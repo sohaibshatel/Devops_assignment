@@ -1,4 +1,4 @@
-      name: Dev Pipeline
+name: Dev Pipeline
 
 on:
   push:
@@ -23,24 +23,21 @@ jobs:
           tar \
             --exclude='.git' \
             --exclude='artifacts' \
-            --exclude='db.sqlite3' \
-            -czf artifacts/app-${{ github.sha }}.tar.gz .
+            --exclude='book-shop/db.sqlite3' \
+            -czf artifacts/app-${{ github.sha }}.tar.gz book-shop
 
       - name: Commit artifact to repository
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
           git add artifacts/
-
           git commit -m "Add build artifact ${{ github.sha }}" || echo "No changes"
-
           git push origin dev
 
       - name: Build Docker image from artifact
         run: |
           docker build \
             -f book-shop/Dockerfile \
-            --build-arg ARTIFACT_PATH=artifacts/app-${{ github.sha }}.tar.gz \
+            --build-arg ARTIFACT_PATH=../artifacts/app-${{ github.sha }}.tar.gz \
             -t book-shop:${{ github.sha }} \
-            book-shop
+            .
