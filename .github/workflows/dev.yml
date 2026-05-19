@@ -20,11 +20,11 @@ jobs:
 
       - name: Create build artifact
         run: |
-          tar \
+          tar -C book-shop \
             --exclude='.git' \
             --exclude='artifacts' \
-            --exclude='book-shop/db.sqlite3' \
-            -czf artifacts/app-${{ github.sha }}.tar.gz book-shop
+            --exclude='db.sqlite3' \
+            -czf artifacts/app-${{ github.sha }}.tar.gz .
 
       - name: Commit artifact to repository
         run: |
