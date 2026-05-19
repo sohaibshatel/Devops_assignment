@@ -1,4 +1,4 @@
-name: Dev Pipeline
+      name: Dev Pipeline
 
 on:
   push:
@@ -40,5 +40,7 @@ jobs:
       - name: Build Docker image from artifact
         run: |
           docker build \
+            -f book-shop/Dockerfile \
             --build-arg ARTIFACT_PATH=artifacts/app-${{ github.sha }}.tar.gz \
-            -t book-shop:${{ github.sha }} .
+            -t book-shop:${{ github.sha }} \
+            book-shop
